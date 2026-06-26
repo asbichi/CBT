@@ -1,0 +1,104 @@
+{
+  "entities": {
+    "Candidate": {
+      "title": "Candidate",
+      "description": "Student candidate information",
+      "type": "object",
+      "properties": {
+        "candidate_id": { "type": "string" },
+        "first_name": { "type": "string" },
+        "last_name": { "type": "string" },
+        "password": { "type": "string" },
+        "created_at": { "type": "string" }
+      },
+      "required": ["candidate_id", "first_name", "last_name", "created_at"]
+    },
+    "Subject": {
+      "title": "Subject",
+      "description": "Examination subjects",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "created_at": { "type": "string" }
+      },
+      "required": ["name", "created_at"]
+    },
+    "Exam": {
+      "title": "Exam",
+      "description": "Global Exam Configuration",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "duration_minutes": { "type": "number" },
+        "total_marks": { "type": "number" },
+        "created_at": { "type": "string" }
+      },
+      "required": ["title", "duration_minutes", "total_marks", "created_at"]
+    },
+    "Question": {
+      "title": "Question",
+      "description": "Question Bank items",
+      "type": "object",
+      "properties": {
+        "question_type": { "type": "string" },
+        "question_text": { "type": "string" },
+        "options": { "type": "array" },
+        "correct_answer": { "type": "string" },
+        "points": { "type": "number" },
+        "subject": { "type": "string" },
+        "difficulty": { "type": "string" },
+        "created_at": { "type": "string" }
+      },
+      "required": ["question_type", "question_text", "points", "created_at"]
+    },
+    "ExamResult": {
+      "title": "ExamResult",
+      "description": "Submitted exam results",
+      "type": "object",
+      "properties": {
+        "candidate_id": { "type": "string" },
+        "candidate_name": { "type": "string" },
+        "exam_title": { "type": "string" },
+        "subject": { "type": "string" },
+        "score": { "type": "number" },
+        "total_points": { "type": "number" },
+        "percentage": { "type": "number" },
+        "time_spent_seconds": { "type": "number" },
+        "correct_count": { "type": "number" },
+        "incorrect_count": { "type": "number" },
+        "unanswered_count": { "type": "number" },
+        "mcq_breakdown": { "type": "object" },
+        "created_at": { "type": "string" },
+        "user_id": { "type": "string" }
+      },
+      "required": [
+        "candidate_id", "candidate_name", "exam_title", "subject",
+        "score", "total_points", "percentage", "time_spent_seconds",
+        "correct_count", "incorrect_count", "unanswered_count",
+        "created_at", "user_id"
+      ]
+    }
+  },
+  "firestore": {
+    "/candidates/{docId}": {
+      "schema": { "$ref": "#/entities/Candidate" },
+      "description": "Student candidates"
+    },
+    "/subjects/{docId}": {
+      "schema": { "$ref": "#/entities/Subject" },
+      "description": "Subjects"
+    },
+    "/exams/{docId}": {
+      "schema": { "$ref": "#/entities/Exam" },
+      "description": "Exam configuration"
+    },
+    "/questions/{docId}": {
+      "schema": { "$ref": "#/entities/Question" },
+      "description": "Question bank"
+    },
+    "/exam_results/{docId}": {
+      "schema": { "$ref": "#/entities/ExamResult" },
+      "description": "Student result submissions"
+    }
+  }
+}

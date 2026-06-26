@@ -1,0 +1,103 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    function existing() { return resource.data; }
+    function incoming() { return request.resource.data; }
+    function isSignedIn() { 
+      return request.auth != null && request.auth.token.email_verified == true; 
+    }
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email == "abdullahibichishuaib.ABS@gmail.com";
+    }
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidCandidate(data) {
+      return data.keys().hasAll(['candidate_id', 'first_name', 'last_name', 'created_at'])
+        && (data.keys().size() == 4 || (data.keys().size() == 5 && 'password' in data))
+        && data.candidate_id is string && data.candidate_id.size() <= 128
+        && data.first_name is string && data.first_name.size() <= 128
+        && data.last_name is string && data.last_name.size() <= 128
+        && data.created_at is string && data.created_at.size() <= 64
+        && (!('password' in data) || (data.password is string && data.password.size() <= 128));
+    }
+
+    function isValidSubject(data) {
+      return data.keys().hasAll(['name', 'created_at'])
+        && data.keys().size() == 2
+        && data.name is string && data.name.size() <= 128
+        && data.created_at is string && data.created_at.size() <= 64;
+    }
+
+    function isValidExam(data) {
+      return data.keys().hasAll(['title', 'duration_minutes', 'total_marks', 'created_at'])
+        && data.keys().size() == 4
+        && data.title is string && data.title.size() <= 256
+        && data.duration_minutes is number
+        && data.total_marks is number
+        && data.created_at is string && data.created_at.size() <= 64;
+    }
+
+    function isValidQuestion(data) {
+      let requiredKeys = ['question_type', 'question_text', 'points', 'subject', 'created_at', 'correct_answer'];
+      return data.keys().hasAll(requiredKeys)
+        && (
+           data.keys().size() == 6 ||
+           (data.keys().size() == 7 && data.keys().hasAny(['options', 'difficulty'])) ||
+           (data.keys().size() == 8 && data.keys().hasAll(requiredKeys.concat(['options', 'difficulty'])))
+        )
+        && data.question_type is string && data.question_type.size() <= 32
+        && data.question_text is string && data.question_text.size() <= 2048
+        && data.points is number
+        && data.subject is string && data.subject.size() <= 128
+        && data.created_at is string && data.created_at.size() <= 64
+        && (!('options' in data) || data.options == null || (data.options is list && data.options.size() <= 10))
+        && (!('difficulty' in data) || (data.difficulty is string && data.difficulty.size() <= 64));
+    }
+
+    function isValidExamResult(data) {
+      let requiredKeys = ['user_id', 'candidate_id', 'candidate_name', 'score', 'created_at', 'percentage', 'total_points', 'exam_title', 'subject', 'time_spent_seconds', 'correct_count', 'incorrect_count', 'unanswered_count'];
+      return data.keys().hasAll(requiredKeys)
+        && (
+           data.keys().size() == 13 ||
+           (data.keys().size() == 14 && data.keys().hasAny(['mcq_breakdown']))
+        )
+        && data.user_id is string && data.user_id.size() <= 128
+        && (data.user_id == 'guest' || (request.auth != null && data.user_id == request.auth.uid))
+        && data.candidate_id is string && data.candidate_id.size() <= 128
+        && data.candidate_name is string && data.candidate_name.size() <= 256
+        && data.exam_title is string && data.exam_title.size() <= 256
+        && data.subject is string && data.subject.size() <= 256
+        && data.score is number
+        && data.total_points is number
+        && data.percentage is number
+        && data.time_spent_seconds is number
+        && data.correct_count is number
+        && data.incorrect_count is number
+        && data.unanswered_count is number
+        && (!('mcq_breakdown' in data) || data.mcq_breakdown is map)
+        && data.created_at is string && data.created_at.size() <= 64;
+    }
+
+    match /candidates/{docId} {
+      allow read, write: if true;
+    }
+    match /subjects/{docId} {
+      allow read, write: if true;
+    }
+    match /exams/{docId} {
+      allow read, write: if true;
+    }
+    match /questions/{docId} {
+      allow read, write: if true;
+    }
+    match /exam_results/{docId} {
+      allow read, write: if true;
+    }
+  }
+}

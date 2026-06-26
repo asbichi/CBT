@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Global CBT Platform",
+  "description": "A secure, standardized Computer-Based Testing application featuring lockdown capabilities, timed assessments, and comprehensive post-exam analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
